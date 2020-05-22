@@ -2,15 +2,19 @@ from typing import Any
 
 from aws_cdk import (
     core, 
-    aws_iam as iam
+    aws_iam as iam,
+    aws_s3 as s3
 )
 from aws_cdk.core import Duration
-from aws_cdk.custom_resources import (AwsCustomResource, AwsCustomResourcePolicy, AwsSdkCall, PhysicalResourceId)
+from aws_cdk.custom_resources import (
+    AwsCustomResource, 
+    AwsCustomResourcePolicy, 
+    AwsSdkCall, 
+    PhysicalResourceId
+)
 from aws_cdk.aws_iam import PolicyStatement
 
 DEFAULT_S3_READ_TIMEOUT_SEC = 100
-
-bucket_arn = 'arn:aws:s3:::roybtenantisolationtests-tenantmetadatabucket33c3-nvaxiizvlk2n' # TODO - get from real bucket
 
 
 class S3ObjectResource(core.Construct):
@@ -23,11 +27,13 @@ class S3ObjectResource(core.Construct):
                  timeout=Duration.seconds(amount=DEFAULT_S3_READ_TIMEOUT_SEC)) -> None:
         super().__init__(scope, id_)
 
+        tenant_config_bucket = s3.Bucket.from_bucket_name(scope=scope, id="TenantConfigBucket", bucket_name=bucket_name)
+
         on_create = self.get_on_create(bucket_name=bucket_name, object_key=object_key, object_content=object_content)
         on_update = on_create  # Updating an S3 object is actually creating a new version
         on_delete = self.get_on_delete(bucket_name, object_key)
 
-        policy = AwsCustomResourcePolicy.from_sdk_calls(resources=[f'{bucket_arn}/{object_key}'])
+        policy = AwsCustomResourcePolicy.from_sdk_calls(resources=[f'{tenant_config_bucket.bucket_arn}/{object_key}'])
        
         lambda_role = self.get_provisioning_lambda_role()
         # lambda_role = None
@@ -41,14 +47,6 @@ class S3ObjectResource(core.Construct):
             id='TenantMetadataConfigS3ObjectLambdaRole', 
             assumed_by=iam.ServicePrincipal('lambda.amazonaws.com'), 
             managed_policies=[iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole")],
-            
-            # inline_policies={
-            #     'TenantMetadataConfigS3ObjectLambdaInlinePolicy':
-            #         iam.PolicyDocument(statements=[
-            #             iam.PolicyStatement(actions=['s3:PutObject'], resources=[bucket_arn], effect=iam.Effect.ALLOW),
-            #             iam.PolicyStatement(actions=['s3:DeleteObject'], resources=[bucket_arn], effect=iam.Effect.ALLOW),
-            #             ])
-            # }
         )
 
     def get_on_create(self, bucket_name, object_key, object_content):
@@ -71,7 +69,7 @@ class S3ObjectResource(core.Construct):
     def get_on_delete(self, bucket_name, object_key):
         delete_params = {
             "Bucket": bucket_name,
-            "Key": object_key,  # TODO add folder
+            "Key": object_key,
         }
 
         on_delete = AwsSdkCall(
