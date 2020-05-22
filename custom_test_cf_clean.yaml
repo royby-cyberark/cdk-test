@@ -1,0 +1,185 @@
+Resources:
+  TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRole7FEA2DC0:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: cdktest/TenantMetadataS3ObjectResource/TenantMetadataConfigS3ObjectLambdaRole/Resource
+  TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRoleDefaultPolicy6673E581:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: s3:PutObject
+            Effect: Allow
+            Resource: arn:aws:s3:::roybtenantisolationtests-tenantmetadatabucket33c3-nvaxiizvlk2n/tenant-somethingsomething-dark-side/meta_data_config
+          - Action: s3:DeleteObject
+            Effect: Allow
+            Resource: arn:aws:s3:::roybtenantisolationtests-tenantmetadatabucket33c3-nvaxiizvlk2n/tenant-somethingsomething-dark-side/meta_data_config
+        Version: "2012-10-17"
+      PolicyName: TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRoleDefaultPolicy6673E581
+      Roles:
+        - Ref: TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRole7FEA2DC0
+    Metadata:
+      aws:cdk:path: cdktest/TenantMetadataS3ObjectResource/TenantMetadataConfigS3ObjectLambdaRole/DefaultPolicy/Resource
+  AwsCustomResourceTenantMetadataS3Object61E26CDC:
+    Type: Custom::AWS-S3-Object
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - AWS679f53fac002430cb0da5b7982bd22872D164C4C
+          - Arn
+      Create:
+        action: putObject
+        service: S3
+        parameters:
+          Body: '{"CelistName": "Yo-Yoma"}'
+          Bucket: roybtenantisolationtests-tenantmetadatabucket33c3-nvaxiizvlk2n
+          Key: tenant-somethingsomething-dark-side/meta_data_config
+        physicalResourceId:
+          responsePath: ETag
+      Update:
+        action: putObject
+        service: S3
+        parameters:
+          Body: '{"CelistName": "Yo-Yoma"}'
+          Bucket: roybtenantisolationtests-tenantmetadatabucket33c3-nvaxiizvlk2n
+          Key: tenant-somethingsomething-dark-side/meta_data_config
+        physicalResourceId:
+          responsePath: ETag
+      Delete:
+        action: deleteObject
+        service: S3
+        parameters:
+          Bucket: roybtenantisolationtests-tenantmetadatabucket33c3-nvaxiizvlk2n
+          Key: tenant-somethingsomething-dark-side/meta_data_config
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: cdktest/AwsCustomResourceTenantMetadataS3Object/Resource/Default
+  AWS679f53fac002430cb0da5b7982bd22872D164C4C:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParametersf35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669S3Bucket536257BA
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParametersf35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669S3VersionKeyC1EF3D23
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParametersf35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669S3VersionKeyC1EF3D23
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRole7FEA2DC0
+          - Arn
+      Runtime: nodejs12.x
+      Timeout: 100
+    DependsOn:
+      - TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRoleDefaultPolicy6673E581
+      - TenantMetadataS3ObjectResourceTenantMetadataConfigS3ObjectLambdaRole7FEA2DC0
+    Metadata:
+      aws:cdk:path: cdktest/AWS679f53fac002430cb0da5b7982bd2287/Resource
+      aws:asset:path: asset.f35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.40.0,@aws-cdk/assets=1.41.0,@aws-cdk/aws-cloudformation=1.41.0,@aws-cdk/aws-cloudwatch=1.41.0,@aws-cdk/aws-ec2=1.41.0,@aws-cdk/aws-events=1.41.0,@aws-cdk/aws-iam=1.41.0,@aws-cdk/aws-kms=1.41.0,@aws-cdk/aws-lambda=1.41.0,@aws-cdk/aws-logs=1.41.0,@aws-cdk/aws-s3=1.41.0,@aws-cdk/aws-s3-assets=1.41.0,@aws-cdk/aws-sns=1.41.0,@aws-cdk/aws-sqs=1.41.0,@aws-cdk/aws-ssm=1.41.0,@aws-cdk/cdk-assets-schema=1.41.0,@aws-cdk/cloud-assembly-schema=1.41.0,@aws-cdk/core=1.41.0,@aws-cdk/custom-resources=1.41.0,@aws-cdk/cx-api=1.41.0,@aws-cdk/region-info=1.41.0,jsii-runtime=Python/3.7.6
+    Condition: CDKMetadataAvailable
+Parameters:
+  AssetParametersf35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669S3Bucket536257BA:
+    Type: String
+    Description: S3 bucket for asset "f35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669"
+  AssetParametersf35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669S3VersionKeyC1EF3D23:
+    Type: String
+    Description: S3 key for asset version "f35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669"
+  AssetParametersf35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669ArtifactHash2C09C7CA:
+    Type: String
+    Description: Artifact hash for asset "f35d0a3ea655835ce2bf399c19e80a38397cebc9cff491b04a9312c92d338669"
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+
